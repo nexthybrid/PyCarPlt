@@ -3,7 +3,9 @@ import math
 import numpy as np
 
 class vehicle2d:
-    """vehicle for drawing vehicle diagram in 2d"""
+    """vehicle for drawing vehicle diagram in 2d
+    The vehicle CG is always assumed at the origin on the plotting axes.
+    """
     wheel_base = [] # distance between front a rear axle in meter
     front_to_cg = [] # distance between front axle to cg in meter
     body_size = [] # (length,width) in meter
@@ -33,7 +35,9 @@ class vehicle2d:
         body_edges = np.matmul(rotation_matrix,body_edges_default) # 2x5 matrix
         #fig = plt.figure()
         #ax = fig.add_subplot(111)
-        plt.plot(body_edges[0], body_edges[1], 'b', linestyle="--")
+        if (z_up==1):
+            plt.plot(body_edges[0], body_edges[1], 'b', linestyle="--")
+        else:
+            plt.plot(body_edges[1], body_edges[0], 'b', linestyle="--")
         axes=plt.gca()
         axes.set_aspect('equal', adjustable='box')
-        #plt.show()
