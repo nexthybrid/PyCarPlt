@@ -1,0 +1,58 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Virtual environments
+venv/
+env/
+env3/
+*.env
+
+# Local development settings
+*.env.local
+*.env.*.local
+
+# Logs and databases
+*.log
+*.sqlite3
+*.db
+
+# Editor-specific
+.vscode/
+.idea/
+
+# Compiled Python files
+*.pyc
+*.pyo
+__pycache__/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Environment configuration
+.env
+
+# Ignore generated files from Jupyter Notebooks
+*.nbconvert.ipynb
+*.ipynb_checkpoints
+
+# Ignore pipenv environment files
+Pipfile.lock
+
+# Ignore macOS system files
+.DS_Store
+
+# Ignore Python coverage reports
+htmlcov/
+.coverage
+.coverage.*

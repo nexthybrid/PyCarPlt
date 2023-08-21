@@ -35,13 +35,44 @@ class tire2d:
         axes.set_aspect('equal', adjustable='box')
         
         if(draw_force==1):
-            Fxt_scaled = self.longitudinal_force / fl_ratio
-            Fyt_scaled = self.lateral_force / fl_ratio
-            Fxt_line_default = [[0,Fxt_scaled],[0,0]]
-            Fyt_line_default = [[0,0],[0,Fyt_scaled]]
-            Fxt_line_rotated = np.matmul(rotation_matrix,Fxt_line_default)
-            Fyt_line_rotated = np.matmul(rotation_matrix,Fyt_line_default)
-            Fxt_line_rotated_translated = [Fxt_line_rotated[0]+x_tire,Fxt_line_rotated[1]+y_tire]
-            Fyt_line_rotated_translated = [Fyt_line_rotated[0]+x_tire,Fyt_line_rotated[1]+y_tire]
-            plt.plot(Fxt_line_rotated_translated[0], Fxt_line_rotated_translated[1], 'r', linestyle="-")
-            plt.plot(Fyt_line_rotated_translated[0], Fyt_line_rotated_translated[1], 'g', linestyle="-")
+            self.draw_tire_force(tire_pose,fl_ratio)
+            # Fxt_scaled = self.longitudinal_force / fl_ratio
+            # Fyt_scaled = self.lateral_force / fl_ratio
+            # Fxt_line_default = [[0,Fxt_scaled],[0,0]]
+            # Fyt_line_default = [[0,0],[0,Fyt_scaled]]
+            # Fxt_line_rotated = np.matmul(rotation_matrix,Fxt_line_default)
+            # Fyt_line_rotated = np.matmul(rotation_matrix,Fyt_line_default)
+            # Fxt_line_rotated_translated = [Fxt_line_rotated[0]+x_tire,Fxt_line_rotated[1]+y_tire]
+            # Fyt_line_rotated_translated = [Fyt_line_rotated[0]+x_tire,Fyt_line_rotated[1]+y_tire]
+            # plt.plot(Fxt_line_rotated_translated[0], Fxt_line_rotated_translated[1], 'r', linestyle="-")
+            # plt.plot(Fyt_line_rotated_translated[0], Fyt_line_rotated_translated[1], 'g', linestyle="-")
+            
+    def draw_tire_force(self,tire_pose,fl_ratio):
+        """draw the tire force on top of tire CG
+        tire_pose: tuple of (x_tire,y_tire,heading_tire) in (meter,meter,radian), all in world frame
+        fl_ratio: force(N)-length(m) ratio for determining the length of force arrow on figure
+        """
+        (x_tire,y_tire,heading_tire) = tire_pose
+        rotation_matrix = [[math.cos(-heading_tire),math.sin(-heading_tire)],
+                           [-math.sin(-heading_tire),math.cos(-heading_tire)]] # 2x2 matrix
+        Fxt_scaled = self.longitudinal_force / fl_ratio
+        Fyt_scaled = self.lateral_force / fl_ratio
+        Fxt_line_default = [[0,Fxt_scaled],[0,0]]
+        Fyt_line_default = [[0,0],[0,Fyt_scaled]]
+        Fxt_line_rotated = np.matmul(rotation_matrix,Fxt_line_default)
+        Fyt_line_rotated = np.matmul(rotation_matrix,Fyt_line_default)
+        Fxt_line_rotated_translated = [Fxt_line_rotated[0]+x_tire,Fxt_line_rotated[1]+y_tire]
+        Fyt_line_rotated_translated = [Fyt_line_rotated[0]+x_tire,Fyt_line_rotated[1]+y_tire]
+        plt.plot(Fxt_line_rotated_translated[0], Fxt_line_rotated_translated[1], 'r', linestyle="-")
+        plt.plot(Fyt_line_rotated_translated[0], Fyt_line_rotated_translated[1], 'g', linestyle="-")
+            
+    def draw_tire_x_axis(self,tire_pose,dash_length=1,z_up=-1):
+        """draw a black dashed line along the tire frame x axis"""
+        # calculate the edges of the line
+        (x_tire,y_tire,heading_tire) = tire_pose
+        x_edge_1 = x_tire + 0.5*dash_length*math.cos(heading_tire)
+        x_edge_2 = x_tire - 0.5*dash_length*math.cos(heading_tire)
+        y_edge_1 = y_tire + 0.5*dash_length*math.sin(heading_tire)
+        y_edge_2 = y_tire - 0.5*dash_length*math.sin(heading_tire)
+        
+        plt.plot([x_edge_1,x_edge_2],[y_edge_1,y_edge_2],'k--')

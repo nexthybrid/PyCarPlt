@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 import math
 import numpy as np
+from lib_graphic import *
+
 class tire2d:
     """vehicle tire in 2d
     The tire contour and forces drawings are first rotated by the tire heading, then translated by
@@ -8,17 +10,17 @@ class tire2d:
     provided externally (e.g. provided in a vehicle2d_single_track class member function draw_vehicle)
     """
     tire_size = [] # meter
-    longitudinal_force = [] # Newton
-    lateral_force = [] # Newton
+    longitudinal_force_tframe = [] # Newton
+    lateral_force_tframe = [] # Newton
     slip_angle = [] # radian
     
-    def __init__(self,tsize=(0.3,0.6),long_f=100,lat_f=1000,slip_ang=0.05):
+    def __init__(self,tsize=(0.3,0.6),long_f_tframe=100,lat_f_tframe=1000,slip_ang=0.05):
         self.tire_size = tsize
-        self.longitudinal_force = long_f
-        self.lateral_force = lat_f
+        self.longitudinal_force_tframe = long_f_tframe
+        self.lateral_force_tframe = lat_f_tframe
         self.slip_angle = slip_ang
         
-    def draw_tire(self,tire_pose,z_up=-1,draw_force=1,draw_x_axis=1,fl_ratio=2000):
+    def draw_tire(self,tire_pose,z_up=-1,draw_force=True,draw_x_axis=True,fl_ratio=2000):
         """
         tire_pose: tuple of (x_tire,y_tire,heading_tire) in (meter,meter,radian), all in world frame
         z_up: the SAE-670 z-up (or z-down) convention for drawing. 1 for z-up, -1 for z-down
@@ -41,9 +43,9 @@ class tire2d:
         axes=plt.gca()
         axes.set_aspect('equal', adjustable='box')
         
-        if(draw_force==1):
+        if(draw_force):
             self.draw_tire_force(tire_pose,fl_ratio=fl_ratio,z_up=z_up)
-        if(draw_x_axis==1):
+        if(draw_x_axis):
             self.draw_tire_x_axis(tire_pose,z_up=z_up)
 
             
@@ -57,17 +59,17 @@ class tire2d:
         # rotate so the tire force can be expressed in global frame
         rotation_matrix = [[math.cos(-heading_tire),math.sin(-heading_tire)],
                            [-math.sin(-heading_tire),math.cos(-heading_tire)]] # 2x2 matrix
-        Fxt_scaled = self.longitudinal_force / fl_ratio
-        Fyt_scaled = self.lateral_force / fl_ratio
+        Fxt_scaled = self.longitudinal_force_tframe / fl_ratio
+        Fyt_scaled = self.lateral_force_tframe / fl_ratio
         Fxt_line_default = [[0,Fxt_scaled],[0,0]] # vector format 2x2 [[x1,x2],[y1,y2]], for both z-up and z-down
         Fyt_line_default = [[0,0],[0,Fyt_scaled]]
         Fxt_line_rotated = np.matmul(rotation_matrix,Fxt_line_default) # force rotated to world frame but centered at tire CG
         Fyt_line_rotated = np.matmul(rotation_matrix,Fyt_line_default) # the first row is always for x, for both z-up and z-down
         Fxt_line_rotated_translated = [Fxt_line_rotated[0]+x_tire,Fxt_line_rotated[1]+y_tire]
         Fyt_line_rotated_translated = [Fyt_line_rotated[0]+x_tire,Fyt_line_rotated[1]+y_tire]
+#         draw_vector_with_text(Fxt_line_rotated_translated,"r",text="",l_text=0.3,z_up=z_up,turn_ang=5/6*math.pi)
+#         draw_vector_with_text(Fyt_line_rotated_translated,"g",text="",l_text=0.3,z_up=z_up,turn_ang=5/6*math.pi)
         if (z_up==1):
-#             plt.plot(Fxt_line_rotated_translated[0], Fxt_line_rotated_translated[1], 'r', linestyle="-")
-#             plt.plot(Fyt_line_rotated_translated[0], Fyt_line_rotated_translated[1], 'g', linestyle="-")
             # longitudinal force arrow in red
             plt.arrow(Fxt_line_rotated_translated[0][0],Fxt_line_rotated_translated[1][0],
                      Fxt_line_rotated_translated[0][1]-Fxt_line_rotated_translated[0][0],
@@ -79,12 +81,6 @@ class tire2d:
                       Fyt_line_rotated_translated[1][1]-Fyt_line_rotated_translated[1][0],width=0.01,
                      head_width=0.05,head_length=0.1,length_includes_head=True,edgecolor='g',facecolor='g')
         else:
-#             plt.plot(Fxt_line_rotated_translated[1], Fxt_line_rotated_translated[0], 'r', linestyle="-")
-#             plt.plot(Fyt_line_rotated_translated[1], Fyt_line_rotated_translated[0], 'g', linestyle="-")
-#             ax = plt.gca()
-#             ax.annotate("",xy=(Fxt_line_rotated_translated[1][1],Fxt_line_rotated_translated[0][1]),xycoords='data',
-#                         xytext=(Fxt_line_rotated_translated[0][1], Fxt_line_rotated_translated[0][0]), textcoords='offset points',
-#                         arrowprops=dict(arrowstyle="->",connectionstyle="arc3"))
             plt.arrow(Fxt_line_rotated_translated[1][0],Fxt_line_rotated_translated[0][0],
                      Fxt_line_rotated_translated[1][1]-Fxt_line_rotated_translated[1][0],
                       Fxt_line_rotated_translated[0][1]-Fxt_line_rotated_translated[0][0],width=0.01,
