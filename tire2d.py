@@ -19,6 +19,15 @@ class tire2d:
         self.longitudinal_force_tframe = long_f_tframe
         self.lateral_force_tframe = lat_f_tframe
         self.slip_angle = slip_ang
+    
+    def update_tire_force(self,f_tframe,slip_ang):
+        """update the tire force
+        f_tframe: the tire force in tire frame, 2x1 matrix [[longitudinal force],[lateral force]]
+        slip_ang: the slip angle in radian
+        """
+        self.longitudinal_force_tframe = f_tframe[0]
+        self.lateral_force_tframe = f_tframe[1]
+        self.slip_angle = slip_ang
         
     def draw_tire(self,tire_pose,z_up=-1,draw_force=True,draw_x_axis=True,fl_ratio=2000):
         """
