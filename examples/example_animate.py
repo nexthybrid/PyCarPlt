@@ -1,9 +1,13 @@
+import os
+import sys
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
 from matplotlib.widgets import Slider
-from vehicle2d_dual_track import *
-from vehicle_plot import *
+# add the project root to the Python path so we can import the module
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(project_root)
+from PyCarPlt.vehicle2d_dual_track import *
+from PyCarPlt.vehicle_plot import *
 
 # Set up the animation parameters
 min_time = 0
@@ -16,7 +20,7 @@ y_max = 5
 
 # Create a vehicle object and a vehicle plot object
 v = vehicle2d_dual_track()
-p = vehicle_plot(v, csv_data_file='drift_data.csv')
+p = vehicle_plot(v, csv_data_file='examples/drift_data.csv')
 
 # Set up the figure and axis
 fig, ax = plt.subplots()

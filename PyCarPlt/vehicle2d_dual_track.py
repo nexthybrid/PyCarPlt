@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import math
 import numpy as np
-from vehicle2d import *
-from tire2d import *
+from PyCarPlt.vehicle2d import *
+from PyCarPlt.tire2d import *
 
 
 class vehicle2d_dual_track(vehicle2d):

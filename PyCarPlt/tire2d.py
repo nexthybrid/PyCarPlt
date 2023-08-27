@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import math
 import numpy as np
-from lib_graphic import *
+from PyCarPlt.lib_graphic import *
 
 class tire2d:
     """vehicle tire in 2d
