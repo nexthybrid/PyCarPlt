@@ -3,6 +3,8 @@ import math
 import numpy as np
 from vehicle2d import *
 from tire2d import *
+
+
 class vehicle2d_dual_track(vehicle2d):
     """dual track vehicle (two tires per axle)"""
     # fl_tire = []
@@ -48,13 +50,17 @@ class vehicle2d_dual_track(vehicle2d):
         self.rl_tire.update_tire_force(tire_forces[2],slip_angles[2])
         self.rr_tire.update_tire_force(tire_forces[3],slip_angles[3])
     
-    def draw_vehicle(self,z_up=-1,save_fig=False,fig_name='vehicle_plot.eps',draw_front_tire_force=True,draw_rear_tire_force=True,
+    def draw_vehicle(self,ax=None, z_up=-1,save_fig=False,fig_name='vehicle_plot.eps',draw_front_tire_force=True,draw_rear_tire_force=True,
                     draw_whl_v = False):
         """draws the vehicle body and tires
+        ax: Matplotlib axis to draw on.
         z_up: the SAE-670 z-up (or z-down) convention for drawing. 1 for z-up, -1 for z-down
         save_fig: whether to save figure
         """
-        self.draw_veh_body(z_up=z_up)
+        if ax is None:
+            ax = plt.gca()
+
+        self.draw_veh_body(ax=ax, z_up=z_up)
         # calculate the tires' poses
         tires_center = self.calc_tires_centers()
         tires_wheel_angles_bframe = np.array(self.wheel_angles) # assume rear wheel is always alined with body axis
@@ -65,14 +71,16 @@ class vehicle2d_dual_track(vehicle2d):
         tire_pose_rr = (tires_center[0,3],tires_center[1,3],tires_headings[3])
         self.update_axle_velocity() # use body velocity, yawrate, and steer angle to calculate axle velocity
         if draw_whl_v:
-            self.draw_wheel_velocity(z_up=z_up)
-        self.fl_tire.draw_tire(tire_pose_fl,z_up=z_up,draw_force=draw_front_tire_force)
-        self.fr_tire.draw_tire(tire_pose_fr,z_up=z_up,draw_force=draw_front_tire_force)
-        self.rl_tire.draw_tire(tire_pose_rl,z_up=z_up,draw_force=draw_rear_tire_force)
-        self.rr_tire.draw_tire(tire_pose_rr,z_up=z_up,draw_force=draw_rear_tire_force)
-        plt.plot()
-        if (save_fig):
-            plt.savefig(fig_name,format='eps')
+            self.draw_wheel_velocity(ax=ax, z_up=z_up)
+        self.fl_tire.draw_tire(ax=ax,tire_pose=tire_pose_fl,z_up=z_up,draw_force=draw_front_tire_force)
+        self.fr_tire.draw_tire(ax=ax,tire_pose=tire_pose_fr,z_up=z_up,draw_force=draw_front_tire_force)
+        self.rl_tire.draw_tire(ax=ax,tire_pose=tire_pose_rl,z_up=z_up,draw_force=draw_rear_tire_force)
+        self.rr_tire.draw_tire(ax=ax,tire_pose=tire_pose_rr,z_up=z_up,draw_force=draw_rear_tire_force)
+        # plt.plot()
+        # if (save_fig):
+        #     plt.savefig(fig_name,format='eps')
+
+        return ax
             
     def calc_axles_center(self):
         """calculate the front and rear axle geometric center"""
@@ -142,8 +150,9 @@ class vehicle2d_dual_track(vehicle2d):
         self.vel_front_bframe = (Vxfb,Vyfb)
         self.vel_rear_bframe = (Vxrb,Vyrb)
     
-    def draw_wheel_velocity(self,z_up=-1,vlratio=10):
+    def draw_wheel_velocity(self,ax= None, z_up=-1,vlratio=10):
         """
+        ax: Matplotlib axis to draw on.
         z_up: the SAE-670 z-up (or z-down) convention for drawing. 1 for z-up, -1 for z-down
         vl_ratio: velocity(m/s)-length(m) ratio for determining the length of velocity arrow on figure
         
@@ -160,4 +169,6 @@ class vehicle2d_dual_track(vehicle2d):
         Vf_line_rotated = np.matmul(rotation_matrix,Vf_line_default) # force rotated to world frame but centered at tire CG
         axles_center = self.calc_axles_center() # 2x2 matrix ([[axle_f_x,axle_r_x],[axle_f_y,axle_r_y])
         Vf_line_rotated_translated = [Vf_line_rotated[0]+axles_center[0][0],Vf_line_rotated[1]+axles_center[1][0]] # translate vector to axle/wheel center
-        draw_vector_with_text(Vf_line_rotated_translated,"k",text=r"$V_f$",l_text=0.3,z_up=z_up,turn_ang=5/6*math.pi)
+        # draw_vector_with_text(Vf_line_rotated_translated,"k",text=r"$V_f$",l_text=0.3,z_up=z_up,turn_ang=5/6*math.pi)
+        draw_vector_with_text_rf(Vf_line_rotated_translated, ax=ax, z_up=z_up, turn_ang=5/6*math.pi)
+        

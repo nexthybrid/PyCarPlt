@@ -96,3 +96,44 @@ def draw_vector_with_text(vector,color,text=r"$V$",l_text=0.3,z_up=-1,turn_ang=5
                                 vector[0][1]-vector[0][0]) # syntax: arctan2(y,x)
         axes.text(vector[1][1]+l_text*math.cos(arrow_angle+turn_ang),
                   vector[0][1]+l_text*math.sin(arrow_angle+turn_ang), text, color=color, fontsize=10)
+
+def draw_vector_with_text_rf(vector, ax=None, color='black', text=r"$V$", l_text=0.3, z_up=-1, turn_ang=5/6*math.pi):
+    """
+    Draws a vector with an arrow and a text near the head of the arrow.
+    
+    vector: 2x2 array of [[x1, x2], [y1, y2]].
+    ax: Matplotlib axis to draw on.
+    color: Color for the arrow and text.
+    text: Text to add near the head of the arrow, located at a length of l_text after a 150-degree u-turn.
+    l_text: Length of travel after a sharp 150-degree u-turn at the arrow head.
+    turn_ang: U-turn angle, default at 150 degrees.
+    """
+    if ax is None:
+        ax = plt.gca()
+
+    if z_up == 1:
+        arrow = ax.arrow(vector[0][0], vector[1][0],
+                        vector[0][1] - vector[0][0],
+                        vector[1][1] - vector[1][0], width=0.01,
+                        head_width=0.05, head_length=0.1, length_includes_head=True,
+                        edgecolor=color, facecolor=color)
+
+        arrow_angle = np.arctan2(vector[1][1] - vector[1][0],
+                                vector[0][1] - vector[0][0])
+        ax.text(vector[0][1] + l_text * math.cos(arrow_angle + turn_ang),
+                vector[1][1] + l_text * math.sin(arrow_angle + turn_ang),
+                text, color=color, fontsize=10)
+    else:
+        arrow = ax.arrow(vector[1][0], vector[0][0],
+                        vector[1][1] - vector[1][0],
+                        vector[0][1] - vector[0][0], width=0.01,
+                        head_width=0.05, head_length=0.1, length_includes_head=True,
+                        edgecolor=color, facecolor=color)
+
+        arrow_angle = np.arctan2(vector[1][1] - vector[1][0],
+                                vector[0][1] - vector[0][0])
+        ax.text(vector[1][1] + l_text * math.cos(arrow_angle + turn_ang),
+                vector[0][1] + l_text * math.sin(arrow_angle + turn_ang),
+                text, color=color, fontsize=10)
+
+    return arrow
