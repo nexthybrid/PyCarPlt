@@ -3,25 +3,55 @@ import math
 import numpy as np
 from vehicle2d import *
 from tire2d import *
-class vehicle2d_single_track(vehicle2d):
-    """single track vehicle (one tire per axle)"""
-    front_tire = []
-    rear_tire = []
-    front_wheel_angle = [] # radians
-    vel_front_bframe = [] # (vel_f_xb,vel_f_yb) front axle velocity in body frame coordinates
-    vel_rear_bframe = [] # rear axle velocity in body frame coordinates
+
+
+class vehicle2d_dual_track(vehicle2d):
+    """dual track vehicle (two tires per axle)"""
+    # fl_tire = []
+    # fr_tire = []
+    # rl_tire = []
+    # rr_tire = []
+    # wheel_angles = [] # radians
+    # wheel_velocities = [] # wheel veolcoties in body frame coordinates
     
-    def __init__(self, force_front_tframe=(100,1000),force_rear_tframe=(3000,1000),slip_ang_frnt=0.05,
-                 whl_ang_frnt = 0,vel_front_bframe=(5,5),vel_rear_bframe=(5,5),**kwargs):
-        super(vehicle2d_single_track, self).__init__(**kwargs) # use default initialization from parent class
-        self.front_tire = tire2d(self.tire_size,force_front_tframe[0],force_front_tframe[1],slip_ang_frnt)
-        self.rear_tire = tire2d(self.tire_size,force_rear_tframe[0],force_rear_tframe[1],0)
-        self.front_wheel_angle = whl_ang_frnt
-        self.vel_front_bframe = vel_front_bframe
-        self.vel_rear_bframe = vel_rear_bframe
-        
+    def __init__(self, **kwargs):
+        super(vehicle2d_dual_track, self).__init__(**kwargs) # use default initialization from parent class
+        tire_f_tframe = ((500,500),(500,500),(500,500),(500,500)) # default tire force in tire frame
+        slip_angles = (0.05,0.05,0.05,0.05) # default slip angles
+        self.fl_tire = tire2d(self.tire_size,tire_f_tframe[0][0],tire_f_tframe[0][1],slip_angles[0])
+        self.fr_tire = tire2d(self.tire_size,tire_f_tframe[1][0],tire_f_tframe[1][1],slip_angles[1])
+        self.rl_tire = tire2d(self.tire_size,tire_f_tframe[2][0],tire_f_tframe[2][1],slip_angles[2])
+        self.rr_tire = tire2d(self.tire_size,tire_f_tframe[3][0],tire_f_tframe[3][1],slip_angles[3])
+
+        self.wheel_angles = (0,0,0,0) # default wheel angles
+        self.vel_front_bframe = (0,0) # default front axle velocity in body frame
+        self.vel_rear_bframe = (0,0) # default rear axle velocity in body frame
+        self.wheel_velocities = ((0,0),(0,0),(0,0),(0,0)) # default wheel velocities
+        self.track_widths = (1.5,1.5) # default front/rear track widths
+    
+    def update_body_pose(self,heading,vel_bframe):
+        """update the body pose
+        heading: the heading angle in radians
+        vel_bframe: the body velocity in body frame
+        """
+        self.heading = heading
+        self.vel_bframe = vel_bframe
+    
+    def update_tire_forces(self,tire_forces,slip_angles):
+        """update the tire forces
+        tire_forces: the tire forces in tire frame, 4x2 matrix [[fl_longitudinal_force,fl_lateral_force],
+                                                                [fr_longitudinal_force,fr_lateral_force],
+                                                                [rl_longitudinal_force,rl_lateral_force],
+                                                                [rr_longitudinal_force,rr_lateral_force]]
+        slip_angles: the slip angles in radian, 4x1 matrix [fl_slip_angle,fr_slip_angle,rl_slip_angle,rr_slip_angle]
+        """
+        self.fl_tire.update_tire_force(tire_forces[0],slip_angles[0])
+        self.fr_tire.update_tire_force(tire_forces[1],slip_angles[1])
+        self.rl_tire.update_tire_force(tire_forces[2],slip_angles[2])
+        self.rr_tire.update_tire_force(tire_forces[3],slip_angles[3])
+    
     def draw_vehicle(self,ax=None, z_up=-1,save_fig=False,fig_name='vehicle_plot.eps',draw_front_tire_force=True,draw_rear_tire_force=True,
-                    draw_whl_v = True):
+                    draw_whl_v = False):
         """draws the vehicle body and tires
         ax: Matplotlib axis to draw on.
         z_up: the SAE-670 z-up (or z-down) convention for drawing. 1 for z-up, -1 for z-down
@@ -30,18 +60,22 @@ class vehicle2d_single_track(vehicle2d):
         if ax is None:
             ax = plt.gca()
 
-        self.draw_veh_body(z_up=z_up)
+        self.draw_veh_body(ax=ax, z_up=z_up)
         # calculate the tires' poses
-        tires_center = self.calc_axles_center()
-        tires_wheel_angles_bframe = np.array([self.front_wheel_angle,0]) # assume rear wheel is always alined with body axis
+        tires_center = self.calc_tires_centers()
+        tires_wheel_angles_bframe = np.array(self.wheel_angles) # assume rear wheel is always alined with body axis
         tires_headings = tires_wheel_angles_bframe + self.heading # 2x1 matrix
-        tire_pose_front = (tires_center[0,0],tires_center[1,0],tires_headings[0])
-        tire_pose_rear = (tires_center[0,1],tires_center[1,1],tires_headings[1])
+        tire_pose_fl = (tires_center[0,0],tires_center[1,0],tires_headings[0])
+        tire_pose_fr = (tires_center[0,1],tires_center[1,1],tires_headings[1])
+        tire_pose_rl = (tires_center[0,2],tires_center[1,2],tires_headings[2])
+        tire_pose_rr = (tires_center[0,3],tires_center[1,3],tires_headings[3])
         self.update_axle_velocity() # use body velocity, yawrate, and steer angle to calculate axle velocity
         if draw_whl_v:
             self.draw_wheel_velocity(ax=ax, z_up=z_up)
-        self.front_tire.draw_tire(ax=ax, tire_pose=tire_pose_front,z_up=z_up,draw_force=draw_front_tire_force)
-        self.rear_tire.draw_tire(ax=ax, tire_pose=tire_pose_rear,z_up=z_up,draw_force=draw_rear_tire_force)
+        self.fl_tire.draw_tire(ax=ax,tire_pose=tire_pose_fl,z_up=z_up,draw_force=draw_front_tire_force)
+        self.fr_tire.draw_tire(ax=ax,tire_pose=tire_pose_fr,z_up=z_up,draw_force=draw_front_tire_force)
+        self.rl_tire.draw_tire(ax=ax,tire_pose=tire_pose_rl,z_up=z_up,draw_force=draw_rear_tire_force)
+        self.rr_tire.draw_tire(ax=ax,tire_pose=tire_pose_rr,z_up=z_up,draw_force=draw_rear_tire_force)
         # plt.plot()
         # if (save_fig):
         #     plt.savefig(fig_name,format='eps')
@@ -58,6 +92,20 @@ class vehicle2d_single_track(vehicle2d):
                            [-math.sin(-self.heading),math.cos(-self.heading)]] # 2x2 matrix
         axles_center = np.matmul(rotation_matrix,axles_center_bframe) # 2x2 matrix ([[axle_f_x,axle_r_x],[axle_f_y,axle_r_y])
         return axles_center
+    
+    def calc_tires_centers(self):
+        """calculate the tires' geometric centers"""
+        a = self.front_to_cg
+        b = self.wheel_base - self.front_to_cg
+        axles_center_bframe = [[a,-b],[0,0]] # in body frame, 2x2 matrix, assuming vehicle originally aligns with x axis
+        # The tires follow the fl, fr, rl, rr order
+        tires_center_bframe = [[a,a,-b,-b],[self.track_widths[0]/2,-self.track_widths[0]/2,
+                                            -self.track_widths[1]/2,self.track_widths[1]/2]] # in body frame, 2x4 matrix
+        # the rotation_matrix rotates vectors in the body frame back to the world frame with an angle of -self.heading
+        rotation_matrix = [[math.cos(-self.heading),math.sin(-self.heading)],
+                           [-math.sin(-self.heading),math.cos(-self.heading)]] # 2x2 matrix
+        tires_centers_global = np.matmul(rotation_matrix,tires_center_bframe) # 2x4 matrix 
+        return tires_centers_global
             
     def calc_vel_axles_bframe(self):
         """calculate the front and rear axle velocity in body frame
@@ -102,7 +150,7 @@ class vehicle2d_single_track(vehicle2d):
         self.vel_front_bframe = (Vxfb,Vyfb)
         self.vel_rear_bframe = (Vxrb,Vyrb)
     
-    def draw_wheel_velocity(self,ax=None, z_up=-1,vlratio=10):
+    def draw_wheel_velocity(self,ax= None, z_up=-1,vlratio=10):
         """
         ax: Matplotlib axis to draw on.
         z_up: the SAE-670 z-up (or z-down) convention for drawing. 1 for z-up, -1 for z-down
@@ -123,3 +171,4 @@ class vehicle2d_single_track(vehicle2d):
         Vf_line_rotated_translated = [Vf_line_rotated[0]+axles_center[0][0],Vf_line_rotated[1]+axles_center[1][0]] # translate vector to axle/wheel center
         # draw_vector_with_text(Vf_line_rotated_translated,"k",text=r"$V_f$",l_text=0.3,z_up=z_up,turn_ang=5/6*math.pi)
         draw_vector_with_text_rf(Vf_line_rotated_translated, ax=ax, z_up=z_up, turn_ang=5/6*math.pi)
+        
