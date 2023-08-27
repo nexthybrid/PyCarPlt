@@ -14,6 +14,7 @@ class vehicle_plot:
     def __init__(self, vehicle, csv_data_file=None, **kwargs):
         self.vehicle = vehicle
         self.df = pd.read_csv(csv_data_file)
+        self.driver_cmd = [0, 0, 0]  # steer, accel, decel
 
     def update_vehicle_by_row_num(self, row_num):
         """update the vehicle pose by row number of the data file
@@ -43,3 +44,30 @@ class vehicle_plot:
         # find the row number in the data file that is closest to the given time
         row_num = self.df.index[(self.df['time']-time).abs().argsort()[0]]
         self.update_vehicle_by_row_num(row_num)
+    
+    def update_driver_cmd(self, steer, accel, decel):
+        """update the driver command
+        steer: the steering angle in rad (handwheel angle)
+        accel: the acceleration pedal position in [0,1]
+        decel: the deceleration pedal position in [0,1]
+        """
+        self.driver_cmd = [steer, accel, decel]
+
+
+    def update_driver_cmd_by_row_num(self, row_num):
+        """update the driver command by row number of the data file
+        This current function is coupled with a specific data file format. It will be generalized in the future.
+        row_num: the row number in the data
+        """
+        steer = self.df.iloc[row_num]['Steer']
+        accel = self.df.iloc[row_num]['Accel']
+        decel = self.df.iloc[row_num]['Decel']
+        self.update_driver_cmd(steer, accel, decel)
+
+    def update_driver_cmd_by_time(self, time):
+        """update the driver command by time
+        time: the time in the data
+        """
+        # find the row number in the data file that is closest to the given time
+        row_num = self.df.index[(self.df['time']-time).abs().argsort()[0]]
+        self.update_driver_cmd_by_row_num(row_num)
