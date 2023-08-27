@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import math
 import numpy as np
-from lib_graphic import *
+from PyCarPlt.lib_graphic import *
 
 class vehicle2d:
     """vehicle for drawing vehicle diagram in 2d

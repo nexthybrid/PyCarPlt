@@ -3,7 +3,7 @@ import math
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from vehicle2d_single_track import *
+from PyCarPlt.vehicle2d_single_track import *
 
 class vehicle_stats_plot:
     """a class to create templated vehicle stats plots"""
