@@ -3,6 +3,7 @@ import math
 import pandas as pd
 import numpy as np
 from PyCarPlt.vehicle2d import *
+from PyCarPlt.vehicle2d_dual_track import *
 from PyCarPlt.tire2d import *
 
 class vehicle_plot:

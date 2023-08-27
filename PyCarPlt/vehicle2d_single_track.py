@@ -13,11 +13,11 @@ class vehicle2d_single_track(vehicle2d):
     vel_front_bframe = [] # (vel_f_xb,vel_f_yb) front axle velocity in body frame coordinates
     vel_rear_bframe = [] # rear axle velocity in body frame coordinates
     
-    def __init__(self, force_front_tframe=(100,1000),force_rear_tframe=(3000,1000),slip_ang_frnt=0.05,
+    def __init__(self, z_up_tire_f=1, force_front_tframe=(100,1000),force_rear_tframe=(3000,1000),slip_ang_frnt=0.05,
                  whl_ang_frnt = 0,vel_front_bframe=(5,5),vel_rear_bframe=(5,5),**kwargs):
         super(vehicle2d_single_track, self).__init__(**kwargs) # use default initialization from parent class
-        self.front_tire = tire2d(self.tire_size,force_front_tframe[0],force_front_tframe[1],slip_ang_frnt)
-        self.rear_tire = tire2d(self.tire_size,force_rear_tframe[0],force_rear_tframe[1],0)
+        self.front_tire = tire2d(self.tire_size,force_front_tframe[0],force_front_tframe[1],slip_ang_frnt,z_up_tire_f=z_up_tire_f)
+        self.rear_tire = tire2d(self.tire_size,force_rear_tframe[0],force_rear_tframe[1],0,z_up_tire_f=z_up_tire_f)
         self.front_wheel_angle = whl_ang_frnt
         self.vel_front_bframe = vel_front_bframe
         self.vel_rear_bframe = vel_rear_bframe
