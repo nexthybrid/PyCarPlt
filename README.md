@@ -15,8 +15,8 @@ Numpy, Matplotlib, Pandas, Seaborn (tested in Python 3.8)
 An examplary script is provided in `example_single_track.ipynb`. 
 A slider bar animation is provided in `example_animate.py`. Run from the project root directory.
 
-The class structure is visualized in `doc\pyCarPlt_class_diagram.png`:
-![Class Diagram](doc\pyCarPlt_class_diagram.png "Class Diagram")
+The class structure is visualized in `doc/pyCarPlt_class_diagram.png`:
+![Class Diagram](doc/pyCarPlt_class_diagram.png "Class Diagram")
 
 
 ## Additional Resource for authors of this repo:
