@@ -20,7 +20,7 @@ y_min = -5
 y_max = 5
 
 # Create a vehicle object and a vehicle plot object
-v = vehicle2d_dual_track()
+v = vehicle2d_dual_track(z_up_tire_f=1)
 p = vehicle_plot(v, csv_data_file='examples/drift_data.csv')
 
 # Create a more complex layout using gridspec
@@ -59,8 +59,9 @@ def slider_update(val):
     steer = p.driver_cmd[0]
     accel = p.driver_cmd[1]
     decel = p.driver_cmd[2]
-    # print the values to the console
-    print("Steer: ", steer, "Accel: ", accel, "Decel: ", decel)
+    # (Debug) print the values to the console
+    # print("Steer: ", steer, "Accel: ", accel, "Decel: ", decel)
+    # (Debug) print the wheel angles to the console
 
     bar_steer[0].set_height(steer)
     bar_accel[0].set_height(accel)

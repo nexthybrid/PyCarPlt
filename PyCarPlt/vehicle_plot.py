@@ -3,6 +3,7 @@ import math
 import pandas as pd
 import numpy as np
 from PyCarPlt.vehicle2d import *
+from PyCarPlt.vehicle2d_dual_track import *
 from PyCarPlt.tire2d import *
 
 class vehicle_plot:
@@ -32,8 +33,13 @@ class vehicle_plot:
         slip_angle_fr = self.df.iloc[row_num]['Alpha_1']
         slip_angle_rl = self.df.iloc[row_num]['Alpha_2']
         slip_angle_rr = self.df.iloc[row_num]['Alpha_3']
+        wheel_angle_fl = self.df.iloc[row_num]['Delta_0']
+        wheel_angle_fr = self.df.iloc[row_num]['Delta_1']
+        wheel_angle_rl = self.df.iloc[row_num]['Delta_2']
+        wheel_angle_rr = self.df.iloc[row_num]['Delta_3']
 
         self.vehicle.update_body_pose(heading=psi,vel_bframe=(xdot,ydot))
+        self.vehicle.update_wheel_angles((wheel_angle_fl,wheel_angle_fr,wheel_angle_rl,wheel_angle_rr))
         self.vehicle.update_tire_forces(tire_forces=(F_tire_fl,F_tire_fr,F_tire_rl,F_tire_rr),\
                             slip_angles=(slip_angle_fl,slip_angle_fr,slip_angle_rl,slip_angle_rr))
 

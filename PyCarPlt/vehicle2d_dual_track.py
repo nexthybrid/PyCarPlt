@@ -14,20 +14,22 @@ class vehicle2d_dual_track(vehicle2d):
     # wheel_angles = [] # radians
     # wheel_velocities = [] # wheel veolcoties in body frame coordinates
     
-    def __init__(self, **kwargs):
+    def __init__(self, z_up_tire_f=1, **kwargs):
         super(vehicle2d_dual_track, self).__init__(**kwargs) # use default initialization from parent class
         tire_f_tframe = ((500,500),(500,500),(500,500),(500,500)) # default tire force in tire frame
         slip_angles = (0.05,0.05,0.05,0.05) # default slip angles
-        self.fl_tire = tire2d(self.tire_size,tire_f_tframe[0][0],tire_f_tframe[0][1],slip_angles[0])
-        self.fr_tire = tire2d(self.tire_size,tire_f_tframe[1][0],tire_f_tframe[1][1],slip_angles[1])
-        self.rl_tire = tire2d(self.tire_size,tire_f_tframe[2][0],tire_f_tframe[2][1],slip_angles[2])
-        self.rr_tire = tire2d(self.tire_size,tire_f_tframe[3][0],tire_f_tframe[3][1],slip_angles[3])
+        self.fl_tire = tire2d(self.tire_size,tire_f_tframe[0][0],tire_f_tframe[0][1],slip_angles[0],z_up_tire_f=z_up_tire_f)
+        self.fr_tire = tire2d(self.tire_size,tire_f_tframe[1][0],tire_f_tframe[1][1],slip_angles[1],z_up_tire_f=z_up_tire_f)
+        self.rl_tire = tire2d(self.tire_size,tire_f_tframe[2][0],tire_f_tframe[2][1],slip_angles[2],z_up_tire_f=z_up_tire_f)
+        self.rr_tire = tire2d(self.tire_size,tire_f_tframe[3][0],tire_f_tframe[3][1],slip_angles[3],z_up_tire_f=z_up_tire_f)
 
         self.wheel_angles = (0,0,0,0) # default wheel angles
         self.vel_front_bframe = (0,0) # default front axle velocity in body frame
         self.vel_rear_bframe = (0,0) # default rear axle velocity in body frame
         self.wheel_velocities = ((0,0),(0,0),(0,0),(0,0)) # default wheel velocities
         self.track_widths = (1.5,1.5) # default front/rear track widths
+
+        self.z_up_tire_force = z_up_tire_f # default z-up or z-down for tire force drawing
     
     def update_body_pose(self,heading,vel_bframe):
         """update the body pose
@@ -36,6 +38,12 @@ class vehicle2d_dual_track(vehicle2d):
         """
         self.heading = heading
         self.vel_bframe = vel_bframe
+    
+    def update_wheel_angles(self, wheel_angles):
+        """update the wheel angles
+        wheel_angles: the wheel angles in radians
+        """
+        self.wheel_angles = wheel_angles
     
     def update_tire_forces(self,tire_forces,slip_angles):
         """update the tire forces

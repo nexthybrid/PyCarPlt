@@ -14,14 +14,15 @@ class tire2d:
     lateral_force_tframe = [] # Newton
     slip_angle = [] # radian
     
-    def __init__(self,tsize=(0.3,0.6),long_f_tframe=100,lat_f_tframe=1000,slip_ang=0.05):
+    def __init__(self,tsize=(0.3,0.6),long_f_tframe=100,lat_f_tframe=1000,slip_ang=0.05,z_up_tire_f=1):
         self.tire_size = tsize
         self.longitudinal_force_tframe = long_f_tframe
         self.lateral_force_tframe = lat_f_tframe
         self.slip_angle = slip_ang
+        self.z_up_tire_force = z_up_tire_f
     
     def update_tire_force(self,f_tframe,slip_ang):
-        """update the tire force
+        """update the tire force and slip angle
         f_tframe: the tire force in tire frame, 2x1 matrix [[longitudinal force],[lateral force]]
         slip_ang: the slip angle in radian
         """
@@ -71,7 +72,9 @@ class tire2d:
 
     def draw_tire_force(self, ax=None, tire_pose=None, fl_ratio=2000, z_up=-1):
         """
-        Draws the tire force on top of the tire CG.
+        Draws the tire force on top of the tire CG. The lateral tire force direction follows the convention
+        specified by self.z_up_tire_force. If self.z_up_tire_force is 1, the ISO 8855 convention is used. If
+        self.z_up_tire_force is -1, the SAE J670e (z-down) convention is used.
         
         ax: Matplotlib axis to draw on.
         tire_pose: Tuple of (x_tire, y_tire, heading_tire) in (meter, meter, radian), all in the world frame.
@@ -100,24 +103,34 @@ class tire2d:
         Fyt_line_rotated_translated = [Fyt_line_rotated[0] + x_tire, Fyt_line_rotated[1] + y_tire]
 
         if z_up == 1:
+            if self.z_up_tire_force == 1:
+                Fy_sign_factor = 1
+            else:
+                Fy_sign_factor = -1
+
             ax.arrow(Fxt_line_rotated_translated[0][0], Fxt_line_rotated_translated[1][0],
                     Fxt_line_rotated_translated[0][1] - Fxt_line_rotated_translated[0][0],
                     Fxt_line_rotated_translated[1][1] - Fxt_line_rotated_translated[1][0], width=0.01,
                     head_width=0.05, head_length=0.1, length_includes_head=True, edgecolor='r', facecolor='r')
 
             ax.arrow(Fyt_line_rotated_translated[0][0], Fyt_line_rotated_translated[1][0],
-                    Fyt_line_rotated_translated[0][1] - Fyt_line_rotated_translated[0][0],
-                    Fyt_line_rotated_translated[1][1] - Fyt_line_rotated_translated[1][0], width=0.01,
+                    (Fyt_line_rotated_translated[0][1] - Fyt_line_rotated_translated[0][0])*Fy_sign_factor,
+                    (Fyt_line_rotated_translated[1][1] - Fyt_line_rotated_translated[1][0])*Fy_sign_factor, width=0.01,
                     head_width=0.05, head_length=0.1, length_includes_head=True, edgecolor='g', facecolor='g')
         else:
+            if self.z_up_tire_force == 1:
+                Fy_sign_factor = -1
+            else:
+                Fy_sign_factor = 1
+
             ax.arrow(Fxt_line_rotated_translated[1][0], Fxt_line_rotated_translated[0][0],
                     Fxt_line_rotated_translated[1][1] - Fxt_line_rotated_translated[1][0],
                     Fxt_line_rotated_translated[0][1] - Fxt_line_rotated_translated[0][0], width=0.01,
                     head_width=0.05, head_length=0.1, length_includes_head=True, edgecolor='r', facecolor='r')
 
             ax.arrow(Fyt_line_rotated_translated[1][0], Fyt_line_rotated_translated[0][0],
-                    Fyt_line_rotated_translated[1][1] - Fyt_line_rotated_translated[1][0],
-                    Fyt_line_rotated_translated[0][1] - Fyt_line_rotated_translated[0][0], width=0.01,
+                    (Fyt_line_rotated_translated[1][1] - Fyt_line_rotated_translated[1][0])*Fy_sign_factor,
+                    (Fyt_line_rotated_translated[0][1] - Fyt_line_rotated_translated[0][0])*Fy_sign_factor, width=0.01,
                     head_width=0.05, head_length=0.1, length_includes_head=True, edgecolor='g', facecolor='g')
 
 

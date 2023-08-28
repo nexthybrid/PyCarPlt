@@ -1,1 +1,1 @@
-{"names":["X","Y","Z","psi","Xdot","Ydot","Zdot","xdot","ydot","zdot","Omega","Fx","Fy","Kappa","Alpha","Steer","Accel","Decel"],"dimensions":[1,1,1,1,1,1,1,1,1,1,4,4,4,4,4,1,1,1]}
+{"names":["X","Y","Z","psi","Xdot","Ydot","Zdot","xdot","ydot","zdot","Omega","Fx","Fy","Kappa","Alpha","Steer","Accel","Decel","Delta_0","Delta_1","Delta_2","Delta_3"],"dimensions":[1,1,1,1,1,1,1,1,1,1,4,4,4,4,4,1,1,1,1,1,1,1]}
