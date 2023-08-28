@@ -59,8 +59,9 @@ def slider_update(val):
     steer = p.driver_cmd[0]
     accel = p.driver_cmd[1]
     decel = p.driver_cmd[2]
-    # print the values to the console
-    print("Steer: ", steer, "Accel: ", accel, "Decel: ", decel)
+    # (Debug) print the values to the console
+    # print("Steer: ", steer, "Accel: ", accel, "Decel: ", decel)
+    # (Debug) print the wheel angles to the console
 
     bar_steer[0].set_height(steer)
     bar_accel[0].set_height(accel)

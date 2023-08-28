@@ -39,6 +39,12 @@ class vehicle2d_dual_track(vehicle2d):
         self.heading = heading
         self.vel_bframe = vel_bframe
     
+    def update_wheel_angles(self, wheel_angles):
+        """update the wheel angles
+        wheel_angles: the wheel angles in radians
+        """
+        self.wheel_angles = wheel_angles
+    
     def update_tire_forces(self,tire_forces,slip_angles):
         """update the tire forces
         tire_forces: the tire forces in tire frame, 4x2 matrix [[fl_longitudinal_force,fl_lateral_force],
